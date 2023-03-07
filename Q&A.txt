@@ -1,0 +1,259 @@
+QnA 답변 모음
+
+
+=영승=
+
+1. FLUX 패턴에 대하여 설명해보세요
+    MVC모델의 한계 때문에 등장
+    MVC는 백엔드에서 많이 사용된다
+    백엔드에서의 수행절차
+    1. client(브라우저 혹은 모바일 앱)의 REQUEST를 보냄(어떤 정보를 주세요)
+    2. request를 분석(Routing)
+    3. 필요한 데이터를 수집/가공
+    4. 데이터를 기반으로 view를 생성(클라이언트에 줄 웹 page)
+
+    request     =>      데이터 수집/가공        =>      뷰 생성     => 결과 응답
+    Controller              Model                       View            Controller
+
+    의존성이 강하다! (각각 전,후의 레이어의 존재를 알아야한다)
+
+    front-end에서 View는 사건의 발생지(?)이다. 즉 온갖 이벤트!!가 발생한다.
+    사용자입력값, 화면선택,변경, 서버와 통신 등등...
+    이런 특성을 Model과 View 관계로 정리하면..
+
+    View    =>      Model
+    뷰의 변경으로   모델을 바꿔야 되는 경우가 있고  ex) 사용자 입력 값
+
+    View    <=      Model
+    모델의 변경 즉 서버로 받은 데이터 또는 어떤 주기적으로 데이터를 생성하는 일이 생긴다거나 할 경우
+    view를 바꿔야 되는 경우도 있다
+
+    그러면? 뷰와 모델이 양쪽으로 복잡한 관계가 될 수 있다!(양방향)
+    이럴 경우 복잡도가 올라간다! 근데?? 뷰는 아주 많다!! 그래서 우리는 view를 잘게 나눈다
+    근데? 뷰가 엄청 많고 다수의 모델이 존재한다면?? 서로간의 의존성이 많아지고 복잡도가 훨씬 더 올라간다.
+    어디서 어디로 호출하는지 혼란스럽다!!
+    이를 해결하기위해 엄청난 컨트롤러가 생기고 view간의 계층처리가 필요하다(잦은 리렌더링을 최소화 하기위해서)
+    
+    그래서 우리에게 필요한 것은 복잡한 view,model관계의 단순화 , view간의 계층처리로 쉽고 효율적인 DOM 처리 등이 필요하다
+
+    이 문제들을 처리하기위해 MVVM, FLUX등이 존재하게 된다!
+    FLUX : 한 방향으로 흐름을 제어하며 동작한다!!!!!!!!!!!!!!!!!!!!!!!!
+
+    뷰에서 어떤 변경 사항이 생기면 어떤 이벤트를 발생시키고(dispatch) 이를 통해 스토어에 전달하고
+    -> 스토어의 변경 사항이 있다면 view로 바뀐다.
+
+    action -> dispatch -> store -> view 
+
+    action : 변경할 데이터 객체, dispatcher를 통해 store에 전달 / dispatcher의 묶음
+    dispatcher : 데이터의 흐름을 관리 해준다. store로 전달
+    store : 상태의 저장소, 상태를 변경할 수 있는 함수를 가지고 있다. 어떤 액션이냐에 따라 함수를 적용하여 상태 변경(dispatcher를 거쳐옴)
+    view : 홤면
+
+2. 아래의 hook 함수는 각각 어느 순간에 사용할까요
+    (1) useReducer
+        - 상태를 변경하는 로직을 컴포넌트에서 분리시킨다. 이로인해 재사용성이 용이해지며 가독성이 증가한다.
+    (2) useContext
+        - 전역으로 state를 관리 해줄 경우에 사용
+            
+
+3. 전역 상태 관리를 해야하는 이유는 무엇일까요
+    - 프로젝트의 규모가 커질수록 하위 컴포넌트로 props를 통해
+        전달하게 되는 깊이가 깊어지고, 이로인해 에러추적이 힘들어지고
+        어디에 어떤 스테이트가있는지 출처확인이 어려워진다
+
+4. 그렇다면 전역 상태 관리는 위 조건에만 부합하면 반드시 수행하는 것이 좋을까요?
+   전역 상태 관리를 통해 얻을 수 있는 장단점에 관하여 토의해보세요
+
+   장점
+        - 유지보수가 용이하다(전역으로 관리해주기 때문에 이곳저곳 찾아볼 필요가 없다)
+    
+    단점
+        - 어쨋든 전역 상태관리도 자원을 잡아먹는다
+
+
+=================================================================
+
+=주람=
+
+1. FLUX 패턴에 대하여 설명해보세요
+    단방향의 데이터 통신(전달?).
+    action이라는 데이터를 dispatcher로만 전달하는 방식으로 에러 발생 시 디버깅 해야하는 부분 판별이 수월해진다.
+
+2. 아래의 hook 함수는 각각 어느 순간에 사용할까요
+    (1) useReducer
+        함수 로직을 컴포넌트로부터 분리시켜 따로 관리하는 것으로 다른곳에서도 같은 함수가 쓰인다면 분리하는 느낌
+
+    (2) useContext
+        전역 상태 관리. 전역에서 접근 가능할 데이터 등이 있을 때 사용한다.
+
+3. 전역 상태 관리를 해야하는 이유는 무엇일까요
+    데이터가 쓰이는 곳 마다 상위에서 하위로 전달하는 방식으로 하면 데이터 흐름 파악이 어려워지고
+    하위 컴포넌트가 늘어갈 수록 depth가 깊어지기 때문에 데이터 접근이 힘들어지기 때문에
+    이를 방지하고자 전역 상태 관리로 어디서든 접근할 수 있도록 하는 것이다.
+
+4. 그렇다면 전역 상태 관리는 위 조건에만 부합하면 반드시 수행하는 것이 좋을까요?
+   전역 상태 관리를 통해 얻을 수 있는 장단점에 관하여 토의해보세요
+    구조가 단순하고 코드량이 많지 않은 프로젝트일 경우 전역 상태관리하는 것이 더 복잡해질 수 있다.
+    따라서 구조가 복잡하거나 규모가 큰 프로젝트일 경우에 기초부터 잘 다지는 것이 중요한 것 같다.
+    전역 상태의 장점은 데이터에 대한 접근을 무조건 상위로부터 받은 데이터에만 하는것이 아니기 때문에
+    데이터 흐름이나 구조 파악에 용이하고, 수정이 필요할 경우 한 군데에서만 수정하고 부분 수정만 하면된다.
+    하지만 단점으로는 원본 데이터가 아닌, 각 함수 혹은 컴포넌트 실행시 깊은 복사로 새롭게 생성한 데이터가 생길 때에는
+    결국 상위에서 하위로 전달하는 구조가 되어 빈도수가 적지않게 원본 데이터에 접근하지 않는 경우가 많을 것 같다..
+    강사님 말씀대로 로그인 정보나 개인 정보 등 어디서나 값 변경없이 동일하게 쓰이는 정보만 전역으로 관리해야할 것 같다.  
+
+=================================================================
+
+= 현서 =
+
+1. FLUX 패턴에 대하여 설명해보세요
+
+   action이라는 특정 객체를 dispatcher가 store(전역으로 사용할 수 있는 비즈니스 로직이나 state가 있는 곳)에 전달
+   action(특정 객체) -> [dispatcher](전달자 역할) -> store(비즈니스 로직/state 있는곳) 
+                        ------------
+                        dispatcher를 통해 어디에서든 action을 store로 보낼 수 있음
+   단방향으로 데이터가 흐르는 패턴으로(?) 데이터 추적이 용이하다.
+
+
+2. 아래의 hook 함수는 각각 어느 순간에 사용할까요
+
+    (1) useReducer
+        : userReducer는 비즈니스 로직(상태 업데이트 로직)을 컴포넌트에서 분리하여 외부 파일에 작성하고, 다른 파일 "어디에서든" action만 실행하면 state를 관리할 수 있으므로
+          재사용성/가독성을 높이고 유지보수를 편리하게 하고 싶을 때 사용한다.
+          [특정 state가 바깥에 있기 때문에, 로직을 변경하기 위해서 이 파일 저 파일 돌아다닐 필요가 없게 되어 편리하다]
+
+        *****사용법*****
+        1) reducer store파일에 따로 떼내어 관리하고 싶은 비즈니스 로직을 작성한다.
+           =>  export const countReducer = (state, action) => {
+                switch (action.type) {
+                  case 'INCREMENT':
+                    return state + action.count;
+                  case 'DECREMENT':
+                    return state - action.count;
+                  default:
+                    return state;
+                }
+              };
+
+        2) 컴포넌트를 사용할 파일에서 useReducer 함수를 선언한다.
+           => const [count, dispatch] = useReducer(countReducer, 0);
+
+        3) 사용할 비즈니스 로직의 action(객체)를 작성한다.
+           => const onIncrementCount = () => {    
+                dispatch({                  // 이때의 dispatch는 위에서 선언한 useReducer함수의 dispatch 배열요소로, 이 dispatch가 객체로 들어있는 action을 countReducer로 전달하는 역할을 함.
+                  type: 'INCREMENT',
+                  count: 3,
+                });
+              };
+
+
+    (2) useContext
+        : state를 전역으로 사용할 수 있게 만드는 것. state를 전역으로 써야하는 이유? state를 props로 전달하는 depth가 깊어질수록 데이터 추적이 어려워져서
+        전역으로 관리하기 위함. 
+        reducer는 비즈니스 로직을 전역화 한거라면, context는 state를 전역화 한 것!
+
+
+        *****사용법*****
+        1) context store 파일에 비어 있는 전역 저장소를 만들어 준다. 
+             => export cons UserContext = createContext();  [여기에 담긴 value는 다른 컴포넌트 어디에서든 쓸 수 있다]
+
+        2) 해당 파일에 provider함수(ex. ContextProvider)를 만들어주고 return 부분에 provider 덮개를 만들어 주고, value값을 채워넣어준다. 
+             => <UserContext.Provider value={state}}>{children}</UserContext.Provider>
+        
+        3) 모든 컴포넌트들이 만나는 App.js에 context 파일에서 export한 provider변수(ContextProvider)로 감싸주어 모든 하위 컴포넌트들이 children이 되도록하여
+           context파일 return부분에 세팅한 value(state)가 (전역으로) 전달될 수 있도록 한다.
+
+        3) state를 관리할 컴포넌트 파일에서 useContext를 사용한다.
+             => const useUserState = useContext(UserContext) 를 컴포넌트 파일에서 작성할 수 있지만, 일일이 useContext(UserContext)를 치기 번거로우니까
+           아래와 같이 context 파일에서 변수로 지정하여 export하여 필요할 때마다 컴포넌트에 useUserState 변수로 사용할 수 있다.
+             => export const useUserState = () => useContext(UserContext)
+           컴포넌트 파일에서 아래와 같이 사용한다.
+             => const userList = useUserState();  // useContext(UserContext)를 변수화 한것.
+
+    => context는 전역으로 state를 관리해주기 위한거고, reducer는 그 state의 비즈니스 로직을 밖으로 빼내기 위함!!     
+
+
+
+
+3. 전역 상태 관리를 해야하는 이유는 무엇일까요
+
+    : 특정 state를 어디서나 편하게 쓰기 위함이다. reducer를 이용하여 전역 state를 관리하는 로직을 또 따로 뺄수 있으니까 context와 reducer를 함께 쓰면 편리하다.
+      그래서, reducer와 context를 함께 쓴다.
+          
+          => const ContextProvider = ({children}) => {
+            const [state, dispatch] = useReducer(userListReducer, null);    // useReducer로 context에 state(데이터)와 dispatch(state를 관리할 비즈니스 로직)를 전역에 전달한다!
+
+            return (
+              <UserContext.Provider value={state}>
+                <UserDisPatchContext.Provider value={dispatch}>{children}</UserDisPatchContext.Provider>
+              </UserContext.Provider>
+            );
+          };
+
+          export default ContextProvider;
+
+
+4. 그렇다면 전역 상태 관리는 위 조건에만 부합하면 반드시 수행하는 것이 좋을까요?
+   전역 상태 관리를 통해 얻을 수 있는 장단점에 관하여 토의해보세요
+
+=================================================================
+
+= 나실 = 
+
+
+1. FLUX 패턴에 대하여 설명해보세요
+
+과거 MVC 패턴 ( Model, View, Controller ) 의 에러추적이 어렵다는 단점을 보완하기 위해
+데이터가 한 방향으로 흐르게 바뀔필요가 있어 등장하게 되었다.
+
+action -> dispatcher -> model(store) -> View
+
+    * action -> 변경할 데이터 객체, dispatcher를 통해서 store에 전달
+    * dispatcher -> 데이터 흐름을 관리(통로, 전달, 매개체)
+    * store -> 상태(state)의 저장소, state를 변경할 수 있는 함수 또한 가지고 있음. dispatcher에서 전달된 값만 수정할 수 있음
+    * view -> 화면
+
+
+2. 아래의 hook 함수는 각각 어느 순간에 사용할까요
+    (1) useReducer
+        - 상태를 변경 혹은 업데이트하는 로직을 컴포넌트에서 분리
+    (2) useContext
+        - 전역상태 관리를 위한 도구, 기능 자체는 redux와 동일
+        - 보통은 업데이트 로직을 관리할 수 있는 reducer와 함께 사용
+        - oop를 활용한 프론트엔드 Dependency Inversion(의존성 주입)에 응용가능
+        > OOP : object oriented programming
+
+3. 전역 상태 관리를 해야하는 이유는 무엇일까요
+====> 에러 추적이 조금 더 편리하게 만들기 위한 redux와 같은 라이브러리 만듬
+
+
+4. 그렇다면 전역 상태 관리는 위 조건에만 부합하면 반드시 수행하는 것이 좋을까요?
+   전역 상태 관리를 통해 얻을 수 있는 장단점에 관하여 토의해보세요.
+
+   장점: 유지보수에 좋고 data가 단방향으로 흐르기에 코드가독성이 좋아진다. 
+   단점: 상태와 변이방법을 정의하기 위한 redux와 action의 코딩량이 많고,
+         지속적으로 로컬 스토어 상태를 원격 서버 상태와 동기화를 위한 
+         saga같은 미들웨어가 추가되면 기능 하나당 추가해야하는 코딩량은 더 많아진다. 
+
+
+=================================================================
+
+= 재훈 = 
+
+1. FLUX 패턴에 대하여 설명해보세요
+    데이터가 한 방향으로 흐르는 패턴.
+
+2. 아래의 hook 함수는 각각 어느 순간에 사용할까요
+
+    (1) useReducer
+     -state 업데이트 로직을 외부에서 관리해야 할 때 사용합니다.
+
+    (2) useContext
+     - 전역 데이터?를 관리할 때 사용합니다.
+
+3. 전역 상태 관리를 해야하는 이유는 무엇일까요
+    - 단순하지 않은 폴더 구조에서 파일들간의 변수와 로직을 쉽게 받기 위해 해야합니다.
+
+4. 그렇다면 전역 상태 관리는 위 조건에만 부합하면 반드시 수행하는 것이 좋을까요?
+   전역 상태 관리를 통해 얻을 수 있는 장단점에 관하여 토의해보세요
+
+   -함수들의 재사용성을 검토한 후에 사용하는 것이 좋다고 생각됩니다.
